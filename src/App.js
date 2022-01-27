@@ -17,7 +17,7 @@ const reducer = (state, action) => {
       return action.data;
     }
     case "CREATE": {
-      newState = [...action.data, ...state];
+      newState = [action.data, ...state];
       break;
     }
     case "REMOVE": {
@@ -31,8 +31,9 @@ const reducer = (state, action) => {
       break;
     }
     default:
-      return newState;
+      return state;
   }
+  return newState;
 };
 
 export const DiaryStateContext = React.createContext();
@@ -74,27 +75,27 @@ const dummyData = [
 function App() {
 
   const [data, dispatch] = useReducer(reducer, dummyData);
-  console.log(new Date().getTime());
 
   const dataId = useRef(0);
   // CREATE
   const onCreate = (date, content, emotion) => {
     dispatch({
-      type: "CREATE", data: {
+      type: "CREATE",
+      data: {
         id: dataId.current,
         date: new Date(date).getTime(),
         content,
-        emotion
+        emotion,
       },
     });
     dataId.current += 1;
-  }
+  };
   // REMOVE
   const onRemove = (targetId) => {
     dispatch({ type: "REMOVE", targetId });
-  }
+  };
   // EDIT
-  const onModify = (targetId, date, content, emotion) => {
+  const onEdit = (targetId, date, content, emotion) => {
     dispatch({
       type: "EDIT",
       data: {
@@ -104,13 +105,13 @@ function App() {
         emotion,
       },
     })
-  }
+  };
 
   return (
     <DiaryStateContext.Provider value={data}>
       <DiaryDispatchContext.Provider value={{
         onCreate,
-        onModify,
+        onEdit,
         onRemove,
       }}
       >
@@ -120,7 +121,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/new" element={<New />} />
-              <Route path="/edit" element={<Edit />} />
+              <Route path="/edit/:id" element={<Edit />} />
               <Route path="/diary/:id" element={<Diary />} />
             </Routes>
           </div>
